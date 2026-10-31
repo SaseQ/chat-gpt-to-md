@@ -5,8 +5,16 @@ function conversationToMarkdown(conversationJson, conversationUrl) {
   const { title, mapping, current_node } = conversationJson;
 
   // Current Branch: walk from current_node up via parent, then reverse.
+  // Structure Errors throw; steps are capped at the node count, so a cycle throws instead of hanging.
+  if (!mapping) throw new Error("Structure Error: missing mapping");
+  if (!current_node) throw new Error("Structure Error: missing current_node");
+  const limit = Object.keys(mapping).length;
   const branch = [];
-  for (let id = current_node; id; id = mapping[id].parent) branch.unshift(mapping[id]);
+  for (let id = current_node; id; id = mapping[id].parent) {
+    if (!Object.hasOwn(mapping, id)) throw new Error(`Structure Error: node ${id} not in mapping`);
+    if (branch.length === limit) throw new Error("Structure Error: cycle in parent chain");
+    branch.unshift(mapping[id]);
+  }
 
   const sections = [];
   for (const { message } of branch) {
