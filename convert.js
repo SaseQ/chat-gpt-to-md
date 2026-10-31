@@ -18,23 +18,39 @@ function conversationToMarkdown(conversationJson, conversationUrl) {
 
   const sections = [];
   for (const { message } of branch) {
-    if (!message) continue;
+    if (!message || !isConversationMessage(message)) continue;
     const heading = message.author.role === "user" ? "User" : "ChatGPT";
-    sections.push(`## ${heading}\n\n${renderContent(message.content)}`);
+    const body = renderContent(message);
+    if (heading === "ChatGPT" && !body.trim()) continue;
+    const last = sections.at(-1);
+    if (heading === "ChatGPT" && last?.heading === "ChatGPT") last.bodies.push(body);
+    else sections.push({ heading, bodies: [body] });
   }
 
   const fallback = `chatgpt-${conversationJson.conversation_id}`;
   const name = (title || "").trim() || fallback;
-  const markdown = [`# ${name}`, conversationUrl, ...sections].join("\n\n") + "\n";
+  const markdown = [`# ${name}`, conversationUrl, ...sections.map((s) => `## ${s.heading}\n\n${s.bodies.join("\n\n")}`)].join("\n\n") + "\n";
   return { filename: (sanitizeFilename(name) || fallback) + ".md", markdown };
 }
 
-function renderContent(content) {
+const HIDDEN_CONTENT_TYPES = ["thoughts", "reasoning_recap", "model_editable_context", "user_editable_context"];
+
+// What the user sees as the conversation; everything else (system, hidden context, reasoning, tool traffic) is dropped.
+function isConversationMessage({ author, recipient, content, metadata = {} }) {
+  if (author.role === "system" || author.role === "tool") return false; // ticket 04: tool messages with images
+  if (recipient !== "all") return false;
+  if (HIDDEN_CONTENT_TYPES.includes(content.content_type)) return false;
+  return !metadata.is_visually_hidden_from_conversation && !metadata.is_thinking_preamble_message;
+}
+
+function renderContent({ content, metadata }) {
   switch (content.content_type) {
     case "text":
-      return content.parts.join("\n");
+      return metadata?.model_dil_v2?.fallbackMarkdown ?? content.parts.join("\n");
     case "code":
       return "```" + (content.language || "") + "\n" + content.text + "\n```";
+    default:
+      return `[Nieobsługiwana treść: ${content.content_type}]`;
   }
 }
 
