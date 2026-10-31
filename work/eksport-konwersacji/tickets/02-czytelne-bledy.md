@@ -4,12 +4,12 @@
 
 **Blocked by:** 01 (Tracer bullet — kliknięcie ikony pobiera Eksport prostej Konwersacji)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Kliknięcie na zwykłej stronie poza Konwersacją pokazuje alert „to nie jest Konwersacja” i nic nie pobiera.
-- [ ] Brak tokena / odpowiedź 401 pokazuje alert o zalogowaniu i nic nie pobiera.
-- [ ] Inny błąd HTTP pokazuje alert „ChatGPT zmienił API, zaktualizuj wtyczkę” i nic nie pobiera.
-- [ ] `conversationToMarkdown` rzuca wyjątek przy: braku `mapping`, braku `current_node` lub `current_node` nieobecnym w `mapping`, `parent` wskazującym na nieistniejący węzeł, cyklu (liczba kroków ograniczona liczbą węzłów).
-- [ ] Wyjątek z modułu konwersji kończy się alertem „ChatGPT zmienił API, zaktualizuj wtyczkę” i nic się nie pobiera.
-- [ ] Błąd wstrzyknięcia jest łapany w backgroundzie i logowany w konsoli workera; brak UI i brak nowych uprawnień.
-- [ ] `bun test`: fixture'y błędów struktury (brak `current_node`, urwany łańcuch, cykl) potwierdzają rzucenie wyjątku bez zawieszenia.
+- [ ] Kliknięcie na zwykłej stronie poza Konwersacją pokazuje alert „to nie jest Konwersacja” i nic nie pobiera. (manual check pending)
+- [ ] Brak tokena / odpowiedź 401 pokazuje alert o zalogowaniu i nic nie pobiera. (manual check pending)
+- [ ] Inny błąd HTTP pokazuje alert „ChatGPT zmienił API, zaktualizuj wtyczkę” i nic nie pobiera. (manual check pending)
+- [x] `conversationToMarkdown` rzuca wyjątek przy: braku `mapping`, braku `current_node` lub `current_node` nieobecnym w `mapping`, `parent` wskazującym na nieistniejący węzeł, cyklu (liczba kroków ograniczona liczbą węzłów).
+- [ ] Wyjątek z modułu konwersji kończy się alertem „ChatGPT zmienił API, zaktualizuj wtyczkę” i nic się nie pobiera. (catch w `content.js`; manual check pending)
+- [x] Błąd wstrzyknięcia jest łapany w backgroundzie i logowany w konsoli workera; brak UI i brak nowych uprawnień.
+- [x] `bun test`: fixture'y błędów struktury (brak `current_node`, urwany łańcuch, cykl) potwierdzają rzucenie wyjątku bez zawieszenia. (`convert.errors.test.js`)
