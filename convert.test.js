@@ -86,3 +86,16 @@ test("convert.js can be injected twice into the same page", async () => {
   expect(() => vm.runInContext(src, ctx)).not.toThrow();
   expect(ctx.conversationToMarkdown(branching, URL).filename).toBe("Pętle w Pythonie.md");
 });
+
+test("code containing a ``` line gets a longer fence so the block stays intact", () => {
+  const conv = {
+    title: "Fence",
+    current_node: "a",
+    mapping: {
+      a: { parent: null, message: { author: { role: "assistant" }, recipient: "all", metadata: {},
+        content: { content_type: "code", language: "md", text: "```js\nx\n````" } } },
+    },
+  };
+  expect(conversationToMarkdown(conv, URL).markdown).toBe(
+    `# Fence\n\n${URL}\n\n## ChatGPT\n\n\`\`\`\`\`md\n\`\`\`js\nx\n\`\`\`\`\n\`\`\`\`\`\n`);
+});

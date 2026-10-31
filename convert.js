@@ -79,8 +79,11 @@ function renderContent({ author, content, metadata = {} }) {
     }
     case "text":
       return withAttachments(metadata.model_dil_v2?.fallbackMarkdown ?? content.parts.map(textPart).join("\n"), attachments);
-    case "code":
-      return "```" + (content.language || "") + "\n" + content.text + "\n```";
+    case "code": {
+      // Fence longer than any backtick run inside, so a ``` line in the code can't close it.
+      const fence = "`".repeat(Math.max(3, ...(content.text.match(/`+/g) || []).map((r) => r.length + 1)));
+      return fence + (content.language || "") + "\n" + content.text + "\n" + fence;
+    }
     default:
       return unsupported(content.content_type);
   }
