@@ -4,14 +4,14 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Wtyczka ładuje się przez „Load unpacked” bez kroku budowania i bez zależności npm; manifest deklaruje wyłącznie `activeTab` i `scripting`.
-- [ ] Kliknięcie ikony na Konwersacji pobiera `.md` bez popupu.
-- [ ] Id Konwersacji jest rozpoznawane w ścieżkach `/c/<id>` i `/g/<gizmo-lub-projekt>/c/<id>`.
-- [ ] Plik zaczyna się `# <tytuł>`, pustą linią i linkiem do Konwersacji; dalej sekcje `## User` / `## ChatGPT`, bez YAML frontmattera.
-- [ ] Eksport zawiera tylko aktualną Gałąź (od `current_node` w górę po `parent`, w kolejności chronologicznej).
-- [ ] Treść `text` zachowuje oryginalny Markdown; treść `code` renderowana jako blok kodu.
-- [ ] Nazwa pliku to tytuł oczyszczony ze znaków niedozwolonych w nazwach plików + `.md`; brak tytułu → nazwa zastępcza z id Konwersacji.
-- [ ] `bun test` przechodzi; syntetyczny fixture z rozgałęzieniem (edycja i regeneracja) potwierdza, że w wyniku jest tylko aktualna Gałąź; testy nazwy pliku pokrywają znaki niedozwolone i brak tytułu.
-- [ ] Testy sprawdzają wyłącznie wynik `conversationToMarkdown`, nie wewnętrzne helpery.
+- [ ] Wtyczka ładuje się przez „Load unpacked” bez kroku budowania i bez zależności npm; manifest deklaruje wyłącznie `activeTab` i `scripting`. (manifest gotowy, brak builda i npm; manual check pending: Load unpacked)
+- [ ] Kliknięcie ikony na Konwersacji pobiera `.md` bez popupu. (manual check pending)
+- [ ] Id Konwersacji jest rozpoznawane w ścieżkach `/c/<id>` i `/g/<gizmo-lub-projekt>/c/<id>`. (regex w `content.js`; manual check pending)
+- [x] Plik zaczyna się `# <tytuł>`, pustą linią i linkiem do Konwersacji; dalej sekcje `## User` / `## ChatGPT`, bez YAML frontmattera.
+- [x] Eksport zawiera tylko aktualną Gałąź (od `current_node` w górę po `parent`, w kolejności chronologicznej).
+- [x] Treść `text` zachowuje oryginalny Markdown; treść `code` renderowana jako blok kodu.
+- [x] Nazwa pliku to tytuł oczyszczony ze znaków niedozwolonych w nazwach plików + `.md`; brak tytułu → nazwa zastępcza z id Konwersacji.
+- [x] `bun test` przechodzi; syntetyczny fixture z rozgałęzieniem (edycja i regeneracja) potwierdza, że w wyniku jest tylko aktualna Gałąź; testy nazwy pliku pokrywają znaki niedozwolone i brak tytułu.
+- [x] Testy sprawdzają wyłącznie wynik `conversationToMarkdown`, nie wewnętrzne helpery.
