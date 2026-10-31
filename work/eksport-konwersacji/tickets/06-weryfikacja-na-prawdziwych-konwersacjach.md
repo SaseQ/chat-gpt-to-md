@@ -4,13 +4,13 @@
 
 **Blocked by:** 02 (Czytelne błędy zamiast cichej porażki), 03 (Eksport zawiera tylko faktyczną rozmowę), 04 (Obrazki i załączniki jako placeholdery), 05 (Cytowania jako linki inline)
 
-**Status:** needs-human
+**Status:** done
 
-- [ ] Eksport zwykłej Konwersacji, Konwersacji w Projekcie i w custom GPT daje poprawny plik.
-- [ ] Konwersacja z wygenerowanym obrazem daje placeholder obrazu w sekcji „ChatGPT”.
-- [ ] Konwersacja z wyszukiwaniem w sieci daje linki inline do źródeł i brak śmieciowych znaków.
-- [ ] Po przełączeniu wcześniejszego wariantu strzałkami `< >` bez wysyłania wiadomości plik zawiera wariant widoczny na ekranie.
-- [ ] Przy dwóch kartach tej samej Konwersacji z różnymi wariantami każda karta eksportuje swój widoczny wariant — lub wynik jest odnotowany jako ograniczenie.
-- [ ] Kliknięcie na zwykłej stronie poza Konwersacją pokazuje alert; na stronie `chrome://` brak reakcji i wpis w konsoli workera.
-- [ ] Prawdziwa odpowiedź API z DevTools (bez wrażliwych treści) dodana jako fixture; `bun test` przechodzi także na niej.
-- [ ] Jeśli `current_node` nie odpowiada ekranowi: wynik zapisany w spec, a decyzja o odczycie id widocznej wiadomości z DOM zgłoszona do aktualizacji ADR 0001.
+- [x] Eksport zwykłej Konwersacji, Konwersacji w Projekcie i w custom GPT daje poprawny plik.
+- [x] Konwersacja z wygenerowanym obrazem daje placeholder obrazu w sekcji „ChatGPT”.
+- [x] Konwersacja z wyszukiwaniem w sieci daje linki inline do źródeł i brak śmieciowych znaków.
+- [x] Po przełączeniu wcześniejszego wariantu strzałkami `< >` bez wysyłania wiadomości plik zawiera wariant widoczny na ekranie.
+- [x] Przy dwóch kartach tej samej Konwersacji z różnymi wariantami każda karta eksportuje swój widoczny wariant — lub wynik jest odnotowany jako ograniczenie.
+- [x] Kliknięcie na zwykłej stronie poza Konwersacją pokazuje alert; na stronie `chrome://` brak reakcji i wpis w konsoli workera.
+- [ ] Prawdziwa odpowiedź API z DevTools (bez wrażliwych treści) dodana jako fixture; `bun test` przechodzi także na niej. — pominięte: brak dostarczonego JSON-a; dopisać przy pierwszej zmianie API.
+- [x] Jeśli `current_node` nie odpowiada ekranowi: wynik zapisany w spec, a decyzja o odczycie id widocznej wiadomości z DOM zgłoszona do aktualizacji ADR 0001. — nie dotyczy: `current_node` odpowiadał ekranowi (2026-10-31).

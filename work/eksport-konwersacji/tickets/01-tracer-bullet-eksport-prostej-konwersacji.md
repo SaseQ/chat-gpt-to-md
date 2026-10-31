@@ -6,9 +6,9 @@
 
 **Status:** done
 
-- [ ] Wtyczka ładuje się przez „Load unpacked” bez kroku budowania i bez zależności npm; manifest deklaruje wyłącznie `activeTab` i `scripting`. (manifest gotowy, brak builda i npm; manual check pending: Load unpacked)
-- [ ] Kliknięcie ikony na Konwersacji pobiera `.md` bez popupu. (manual check pending)
-- [ ] Id Konwersacji jest rozpoznawane w ścieżkach `/c/<id>` i `/g/<gizmo-lub-projekt>/c/<id>`. (regex w `content.js`; manual check pending)
+- [x] Wtyczka ładuje się przez „Load unpacked” bez kroku budowania i bez zależności npm; manifest deklaruje wyłącznie `activeTab` i `scripting`. (manifest gotowy, brak builda i npm; sprawdzone ręcznie 2026-10-31)
+- [x] Kliknięcie ikony na Konwersacji pobiera `.md` bez popupu. (sprawdzone ręcznie 2026-10-31)
+- [x] Id Konwersacji jest rozpoznawane w ścieżkach `/c/<id>` i `/g/<gizmo-lub-projekt>/c/<id>`. (regex w `content.js`; sprawdzone ręcznie 2026-10-31)
 - [x] Plik zaczyna się `# <tytuł>`, pustą linią i linkiem do Konwersacji; dalej sekcje `## User` / `## ChatGPT`, bez YAML frontmattera.
 - [x] Eksport zawiera tylko aktualną Gałąź (od `current_node` w górę po `parent`, w kolejności chronologicznej).
 - [x] Treść `text` zachowuje oryginalny Markdown; treść `code` renderowana jako blok kodu.

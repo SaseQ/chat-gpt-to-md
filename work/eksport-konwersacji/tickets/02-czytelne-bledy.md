@@ -6,7 +6,7 @@
 
 **Status:** done
 
-- [ ] Kliknięcie na zwykłej stronie poza Konwersacją pokazuje alert „to nie jest Konwersacja” i nic nie pobiera. (manual check pending)
+- [x] Kliknięcie na zwykłej stronie poza Konwersacją pokazuje alert „to nie jest Konwersacja” i nic nie pobiera. (sprawdzone ręcznie 2026-10-31)
 - [ ] Brak tokena / odpowiedź 401 pokazuje alert o zalogowaniu i nic nie pobiera. (manual check pending)
 - [ ] Inny błąd HTTP pokazuje alert „ChatGPT zmienił API, zaktualizuj wtyczkę” i nic nie pobiera. (manual check pending)
 - [x] `conversationToMarkdown` rzuca wyjątek przy: braku `mapping`, braku `current_node` lub `current_node` nieobecnym w `mapping`, `parent` wskazującym na nieistniejący węzeł, cyklu (liczba kroków ograniczona liczbą węzłów).
