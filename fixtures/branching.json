@@ -1,0 +1,22 @@
+{
+  "conversation_id": "6a1b2c3d-0000-4000-8000-000000000001",
+  "title": "Pętle w Pythonie",
+  "current_node": "a4",
+  "mapping": {
+    "root": { "id": "root", "parent": null, "children": ["u1", "u2"], "message": null },
+    "u1": { "id": "u1", "parent": "root", "children": ["a1"],
+      "message": { "author": { "role": "user" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Jak zrobić pętlę? (przed edycją)"] }, "metadata": {} } },
+    "a1": { "id": "a1", "parent": "u1", "children": [],
+      "message": { "author": { "role": "assistant" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Odpowiedź na porzuconą wersję."] }, "metadata": {} } },
+    "u2": { "id": "u2", "parent": "root", "children": ["a2", "a3"],
+      "message": { "author": { "role": "user" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Jak zrobić pętlę **for** w Pythonie?"] }, "metadata": {} } },
+    "a2": { "id": "a2", "parent": "u2", "children": [],
+      "message": { "author": { "role": "assistant" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Stara odpowiedź przed regeneracją."] }, "metadata": {} } },
+    "a3": { "id": "a3", "parent": "u2", "children": ["u3"],
+      "message": { "author": { "role": "assistant" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Użyj `for`:\n\n```python\nfor i in range(3):\n    print(i)\n```\n\n- prosto\n- czytelnie"] }, "metadata": {} } },
+    "u3": { "id": "u3", "parent": "a3", "children": ["a4"],
+      "message": { "author": { "role": "user" }, "recipient": "all", "content": { "content_type": "text", "parts": ["A pętla while?"] }, "metadata": {} } },
+    "a4": { "id": "a4", "parent": "u3", "children": [],
+      "message": { "author": { "role": "assistant" }, "recipient": "all", "content": { "content_type": "code", "language": "python", "text": "while True:\n    break" }, "metadata": {} } }
+  }
+}

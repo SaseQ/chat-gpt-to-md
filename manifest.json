@@ -1,0 +1,9 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT to Markdown",
+  "version": "0.1.0",
+  "description": "Eksport aktualnej Gałęzi Konwersacji ChatGPT do pliku Markdown.",
+  "permissions": ["activeTab", "scripting"],
+  "action": { "default_title": "Eksportuj Konwersację do Markdown" },
+  "background": { "service_worker": "background.js" }
+}
