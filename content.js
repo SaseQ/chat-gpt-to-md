@@ -1,14 +1,26 @@
 // Injected on icon click, after convert.js. IIFE so re-injection on the next click doesn't redeclare anything.
 (async () => {
+  const NOT_CONVERSATION = "To nie jest Konwersacja ChatGPT. Otwórz rozmowę (adres /c/...) i kliknij ponownie.";
+  const LOG_IN = "Zaloguj się do ChatGPT i spróbuj ponownie.";
+  const API_CHANGED = "ChatGPT zmienił API, zaktualizuj wtyczkę.";
+  // Thrown for errors whose message is already meant for the user; anything else maps to API_CHANGED.
+  const fail = (msg) => { throw Object.assign(new Error(msg), { forUser: true }); };
+
   try {
     const id = location.pathname.match(/^\/(?:g\/[^/]+\/)?c\/([0-9a-f-]+)/i)?.[1];
-    if (!id) throw new Error("To nie jest Konwersacja ChatGPT.");
+    if (!id) fail(NOT_CONVERSATION);
 
-    const { accessToken } = await (await fetch("/api/auth/session")).json();
+    const session = await fetch("/api/auth/session");
+    if (session.status === 401) fail(LOG_IN);
+    if (!session.ok) throw new Error(`Session HTTP ${session.status}`);
+    const { accessToken } = await session.json(); // logged out → 200 with {} → no token
+    if (!accessToken) fail(LOG_IN);
+
     const res = await fetch(`/backend-api/conversation/${id}`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    if (!res.ok) throw new Error(`Błąd HTTP ${res.status}.`);
+    if (res.status === 401) fail(LOG_IN);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const { filename, markdown } = conversationToMarkdown(await res.json(), location.href);
 
@@ -18,7 +30,7 @@
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   } catch (e) {
-    // ponytail: bare message; readable per-case messages come in ticket 02.
-    alert(`Eksport nie powiódł się: ${e.message}`);
+    if (!e.forUser) console.error("Eksport nie powiódł się:", e);
+    alert(e.forUser ? e.message : API_CHANGED);
   }
 })();
