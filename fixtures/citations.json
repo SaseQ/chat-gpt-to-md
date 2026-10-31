@@ -1,0 +1,28 @@
+{
+  "conversation_id": "6a1b2c3d-0000-4000-8000-000000000005",
+  "title": "Wyszukiwanie w sieci",
+  "current_node": "a1",
+  "mapping": {
+    "root": { "id": "root", "parent": null, "children": ["u1"], "message": null },
+    "u1": { "id": "u1", "parent": "root", "children": ["a1"],
+      "message": { "author": { "role": "user" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Co nowego w Pythonie?"] }, "metadata": {} } },
+    "a1": { "id": "a1", "parent": "u1", "children": [],
+      "message": { "author": { "role": "assistant" }, "recipient": "all",
+        "content": { "content_type": "text", "parts": [
+          "Wydano Pythona 3.13. citeturn0search0\nDarmowy citeturn0search1\nPusty alt.citeturn0search2\nZagnieżdżony citeturn1citeturn2\nBezpieczny citeturn3\nZobacz [docs](https://docs.python.org).\n\n```python\nprint(1)\n```\n\nWięcej: urlPython.orghttps://python.org Koniec.citeturn9turn10"
+        ] },
+        "metadata": { "content_references": [
+          { "type": "sources_footnote", "matched_text": " ", "alt": "ŹRÓDŁA", "sources": [{ "title": "Python News", "url": "https://python.org/news" }] },
+          { "type": "grouped_webpages", "matched_text": "citeturn0search0", "alt": "([Python News](https://python.org/news))",
+            "items": [{ "title": "Python News", "url": "https://python.org/news", "supporting_websites": [{ "title": "Wiki", "url": "https://wiki.org/Python" }] }] },
+          { "type": "product_entity", "matched_text": "citeturn0search1", "alt": "(open source)", "items": [] },
+          { "type": "product_entity", "matched_text": "citeturn0search2", "alt": "" },
+          { "type": "grouped_webpages", "matched_text": "citeturn1", "alt": "(zła podmiana)" },
+          { "type": "grouped_webpages", "matched_text": "citeturn1citeturn2", "alt": "",
+            "fallback_items": [{ "title": "PEP 703", "url": "https://peps.python.org/pep-0703/" }] },
+          { "type": "grouped_webpages", "matched_text": "citeturn3", "alt": "", "safe_urls": ["https://safe.example"] },
+          { "type": "url", "matched_text": "[docs](https://docs.python.org)", "alt": "ZEPSUTY LINK" },
+          { "type": "client_defined_widget", "matched_text": "```python\nprint(1)\n```", "alt": "ZEPSUTY KOD", "data": { "widget_type": "code_block" } }
+        ] } } }
+  }
+}
