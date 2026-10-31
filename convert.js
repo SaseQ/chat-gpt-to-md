@@ -1,6 +1,7 @@
 // Pure conversion: ChatGPT /backend-api/conversation JSON -> Markdown.
 // Loaded as a classic script in the page (global function) and as a module in `bun test`.
-
+// IIFE so injecting it again on the next click doesn't redeclare the top-level consts.
+(() => {
 function conversationToMarkdown(conversationJson, conversationUrl) {
   const { title, mapping, current_node } = conversationJson;
 
@@ -19,17 +20,19 @@ function conversationToMarkdown(conversationJson, conversationUrl) {
   const sections = [];
   for (const { message } of branch) {
     if (!message || !isConversationMessage(message)) continue;
-    const heading = message.author.role === "user" ? "User" : "ChatGPT";
+    const fromChatGPT = message.author.role !== "user";
     const body = applyCitations(renderContent(message), message.metadata);
-    if (heading === "ChatGPT" && !body.trim()) continue;
+    if (fromChatGPT && !body.trim()) continue;
     const last = sections.at(-1);
-    if (heading === "ChatGPT" && last?.heading === "ChatGPT") last.bodies.push(body);
-    else sections.push({ heading, bodies: [body] });
+    if (fromChatGPT && last?.fromChatGPT) last.bodies.push(body);
+    else sections.push({ fromChatGPT, bodies: [body] });
   }
 
-  const fallback = `chatgpt-${conversationJson.conversation_id}`;
+  const id = conversationJson.conversation_id ?? conversationUrl?.match(/\/c\/([^/?#]+)/)?.[1];
+  const fallback = `chatgpt-${id}`;
   const name = (title || "").trim() || fallback;
-  const markdown = [`# ${name}`, conversationUrl, ...sections.map((s) => `## ${s.heading}\n\n${s.bodies.join("\n\n")}`)].join("\n\n") + "\n";
+  const sectionBlocks = sections.map((s) => `## ${s.fromChatGPT ? "ChatGPT" : "User"}\n\n${s.bodies.join("\n\n")}`);
+  const markdown = [`# ${name}`, conversationUrl, ...sectionBlocks].join("\n\n") + "\n";
   return { filename: (sanitizeFilename(name) || fallback) + ".md", markdown };
 }
 
@@ -47,6 +50,8 @@ function isConversationMessage({ author, recipient, content, metadata = {} }) {
 const isImagePart = (p) => p?.content_type === "image_asset_pointer";
 // file-service://file-X and sediment://file_X both point at the attachment id after "://".
 const pointerId = (p) => p.asset_pointer?.split("://")[1];
+const unsupported = (type) => `[Nieobsługiwana treść: ${type}]`;
+const textPart = (p) => (typeof p === "string" ? p : unsupported(p?.content_type));
 
 // Generated images (multimodal_text) and code-interpreter charts (execution_output).
 function toolImageCount({ content, metadata = {} }) {
@@ -62,18 +67,22 @@ function renderContent({ author, content, metadata = {} }) {
   switch (content.content_type) {
     case "multimodal_text": {
       const shown = new Set(content.parts.filter(isImagePart).map(pointerId));
-      const name = (part) => attachments.find((a) => a.id === pointerId(part))?.name;
+      const imagePlaceholder = (part) => {
+        const fileName = attachments.find((a) => a.id === pointerId(part))?.name;
+        return fileName ? `[obraz: ${fileName}]` : "[obraz]";
+      };
       const body = content.parts
-        .map((p) => (isImagePart(p) ? (name(p) ? `[obraz: ${name(p)}]` : "[obraz]") : typeof p === "string" ? p : ""))
-        .filter(Boolean).join("\n");
+        .map((p) => (isImagePart(p) ? imagePlaceholder(p) : textPart(p)))
+        .filter(Boolean)
+        .join("\n");
       return withAttachments(body, attachments.filter((a) => !shown.has(a.id)));
     }
     case "text":
-      return withAttachments(metadata.model_dil_v2?.fallbackMarkdown ?? content.parts.join("\n"), attachments);
+      return withAttachments(metadata.model_dil_v2?.fallbackMarkdown ?? content.parts.map(textPart).join("\n"), attachments);
     case "code":
       return "```" + (content.language || "") + "\n" + content.text + "\n```";
     default:
-      return `[Nieobsługiwana treść: ${content.content_type}]`;
+      return unsupported(content.content_type);
   }
 }
 
@@ -84,6 +93,7 @@ function withAttachments(body, attachments) {
 }
 
 // Web-search Citations: content_references and private-use-area markers -> Markdown.
+// Markers look like <kind><arg>....
 function applyCitations(text, metadata) {
   const refs = (metadata?.content_references || [])
     .filter((r) => r.matched_text && r.type !== "sources_footnote" && r.type !== "url" &&
@@ -102,13 +112,38 @@ function applyCitations(text, metadata) {
   }
   return text
     .replace(/url([^-]*)([^-]+)/g, "[$1]($2)")
-    .replace(/cite([^]*)+/g, "")
+    .replace(/entity([^]*)/g, (_, json) => entityName(json))
+    .replace(/[^]*/g, "") // citations and any other complete marker
     .replace(/[-]/g, ""); // stray marker delimiters
 }
 
-function sanitizeFilename(name) {
-  // Windows also rejects trailing dots/spaces.
-  return name.replace(/[<>:"/\\|?*\x00-\x1f]/g, "_").replace(/[. ]+$/, "");
+// entity["city","Paris",...] -> "Paris"; unparseable -> nothing.
+function entityName(json) {
+  try {
+    const name = JSON.parse(json)[1];
+    return typeof name === "string" ? name : "";
+  } catch {
+    return "";
+  }
 }
 
+const MAX_FILENAME_LENGTH = 200; // before ".md"; well under the 255 filesystem limit
+
+function sanitizeFilename(name) {
+  let safe = name.replace(/[<>:"/\\|?*\x00-\x1f]/g, "_");
+  if (safe.length > MAX_FILENAME_LENGTH) {
+    // Cut by code points so a surrogate pair is never split.
+    let cut = "";
+    for (const ch of safe) {
+      if (cut.length + ch.length > MAX_FILENAME_LENGTH) break;
+      cut += ch;
+    }
+    safe = cut;
+  }
+  safe = safe.replace(/[. ]+$/, ""); // Windows rejects trailing dots/spaces
+  return /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(safe) ? safe + "_" : safe;
+}
+
+globalThis.conversationToMarkdown = conversationToMarkdown;
 if (typeof module !== "undefined") module.exports = { conversationToMarkdown };
+})();

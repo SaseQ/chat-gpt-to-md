@@ -59,3 +59,30 @@ while True:
 \`\`\`
 `);
 });
+
+test("filename is capped in length without splitting a surrogate pair", () => {
+  const { filename } = conversationToMarkdown(withTitle("a" + "😀".repeat(150)), URL);
+  expect(filename.length).toBeLessThanOrEqual(203);
+  expect(filename).not.toMatch(/[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/);
+  expect(filename.endsWith(".md")).toBe(true);
+});
+
+test("Windows reserved names get an underscore appended", () => {
+  for (const title of ["CON", "nul", "Com1", "LPT9", "aux"])
+    expect(conversationToMarkdown(withTitle(title), URL).filename).toBe(`${title}_.md`);
+  expect(conversationToMarkdown(withTitle("CONsole"), URL).filename).toBe("CONsole.md");
+});
+
+test("without title and conversation_id the fallback name uses the id from the URL", () => {
+  const { conversation_id, ...rest } = withTitle(null);
+  expect(conversationToMarkdown(rest, URL).filename).toBe("chatgpt-6a1b2c3d-0000-4000-8000-000000000001.md");
+});
+
+test("convert.js can be injected twice into the same page", async () => {
+  const vm = await import("node:vm");
+  const src = await Bun.file(`${import.meta.dir}/convert.js`).text();
+  const ctx = vm.createContext({});
+  vm.runInContext(src, ctx);
+  expect(() => vm.runInContext(src, ctx)).not.toThrow();
+  expect(ctx.conversationToMarkdown(branching, URL).filename).toBe("Pętle w Pythonie.md");
+});

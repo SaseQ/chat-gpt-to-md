@@ -25,5 +25,27 @@ test("sources_footnote, url and code-block widget references leave the text unto
 
 test("inline link markers become Markdown links and leftover citation markers are removed", () => {
   expect(md()).toContain("Więcej: [Python.org](https://python.org) Koniec.\n");
-  expect(md()).not.toMatch(/[-]/);
+  expect(md()).not.toMatch(/[-]/);
+});
+
+const assistantSays = (text) => conversationToMarkdown({
+  title: "t", current_node: "a",
+  mapping: { a: { id: "a", parent: null, message: {
+    author: { role: "assistant" }, recipient: "all", content: { content_type: "text", parts: [text] }, metadata: {},
+  } } },
+}, "u").markdown;
+
+test("unclosed citation marker followed by many separators is handled quickly", () => {
+  const start = performance.now();
+  const out = assistantSays("Tekst cite" + "turn0".repeat(40) + " koniec");
+  expect(performance.now() - start).toBeLessThan(200);
+  expect(out).toContain("Tekst cite");
+  expect(out).toContain(" koniec");
+});
+
+test("entity markers become their display name; other markers vanish without eating visible text", () => {
+  expect(assistantSays('Lecę do entity["city","Paryż",{"x":1}] jutro.')).toContain("Lecę do Paryż jutro.");
+  expect(assistantSays("Zepsuty entity[nie json koniec.")).toContain("Zepsuty  koniec.");
+  expect(assistantSays("A navlistNagłówekturn0news1 B.")).toContain("A  B.");
+  expect(assistantSays("Zostaje cite niezamknięte")).toContain("Zostaje cite niezamknięte");
 });
