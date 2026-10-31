@@ -12,7 +12,7 @@ function conversationToMarkdown(conversationJson, conversationUrl) {
   for (const { message } of branch) {
     if (!message) continue;
     const heading = message.author.role === "user" ? "User" : "ChatGPT";
-    sections.push(`## ${heading}\n\n${renderContent(message.content)}`);
+    sections.push(`## ${heading}\n\n${applyCitations(renderContent(message.content), message.metadata)}`);
   }
 
   const fallback = `chatgpt-${conversationJson.conversation_id}`;
@@ -28,6 +28,29 @@ function renderContent(content) {
     case "code":
       return "```" + (content.language || "") + "\n" + content.text + "\n```";
   }
+}
+
+// Web-search Citations: content_references and private-use-area markers -> Markdown.
+function applyCitations(text, metadata) {
+  const refs = (metadata?.content_references || [])
+    .filter((r) => r.matched_text && r.type !== "sources_footnote" && r.type !== "url" &&
+      !(r.type === "client_defined_widget" && r.data?.widget_type === "code_block"))
+    .sort((a, b) => b.matched_text.length - a.matched_text.length);
+  for (const ref of refs) {
+    const sources = [
+      ...(ref.items || []).flatMap((i) => [i, ...(i.supporting_websites || [])]),
+      ...(ref.fallback_items || []),
+      ...(ref.safe_urls || []).filter(Boolean).map((url) => ({ url })),
+    ];
+    const replacement = sources.length
+      ? `(${sources.map((s) => `[${s.title || s.url}](${s.url})`).join(", ")})`
+      : ref.alt || "";
+    text = text.replaceAll(ref.matched_text, () => replacement);
+  }
+  return text
+    .replace(/url([^-]*)([^-]+)/g, "[$1]($2)")
+    .replace(/cite([^]*)+/g, "")
+    .replace(/[-]/g, ""); // stray marker delimiters
 }
 
 function sanitizeFilename(name) {
