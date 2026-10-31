@@ -1,0 +1,44 @@
+{
+  "title": "Obrazki",
+  "conversation_id": "6a1b2c3d-0000-4000-8000-000000000004",
+  "current_node": "a2",
+  "mapping": {
+    "root": { "id": "root", "parent": null, "children": ["u1"], "message": null },
+    "u1": { "id": "u1", "parent": "root", "children": ["call"],
+      "message": { "author": { "role": "user" }, "recipient": "all",
+        "content": { "content_type": "multimodal_text", "parts": [
+          { "content_type": "image_asset_pointer", "asset_pointer": "sediment://file_kot", "width": 100, "height": 100 },
+          { "content_type": "image_asset_pointer", "asset_pointer": "file-service://file-bezimienny" },
+          "Co jest na zdjęciu?"
+        ] },
+        "metadata": { "attachments": [
+          { "id": "file_kot", "name": "kot.png", "mime_type": "image/png" },
+          { "id": "file_raport", "name": "raport.pdf", "mime_type": "application/pdf" }
+        ] } } },
+    "call": { "id": "call", "parent": "u1", "children": ["gen"],
+      "message": { "author": { "role": "assistant" }, "recipient": "t2uay3k.sj1i4kz", "content": { "content_type": "text", "parts": ["{\"prompt\": \"WYWOŁANIE\"}"] }, "metadata": {} } },
+    "gen": { "id": "gen", "parent": "call", "children": ["a1"],
+      "message": { "author": { "role": "tool", "name": "t2uay3k.sj1i4kz" }, "recipient": "all",
+        "content": { "content_type": "multimodal_text", "parts": [
+          { "content_type": "image_asset_pointer", "asset_pointer": "sediment://file_wygenerowany" },
+          "TEKST NARZĘDZIA"
+        ] }, "metadata": {} } },
+    "a1": { "id": "a1", "parent": "gen", "children": ["code"],
+      "message": { "author": { "role": "assistant" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Oto kot."] }, "metadata": {} } },
+    "code": { "id": "code", "parent": "a1", "children": ["out"],
+      "message": { "author": { "role": "assistant" }, "recipient": "python", "content": { "content_type": "code", "language": "python", "text": "plt.show() # WYWOŁANIE" }, "metadata": {} } },
+    "out": { "id": "out", "parent": "code", "children": ["fs"],
+      "message": { "author": { "role": "tool", "name": "python" }, "recipient": "all",
+        "content": { "content_type": "execution_output", "text": "WYNIK WYKONANIA" },
+        "metadata": { "aggregate_result": { "messages": [
+          { "message_type": "stream", "text": "WYNIK STREAM" },
+          { "message_type": "image", "image_url": "file-service://file-wykres1" },
+          { "message_type": "image", "image_url": "file-service://file-wykres2" }
+        ] } } } },
+    "fs": { "id": "fs", "parent": "out", "children": ["a2"],
+      "message": { "author": { "role": "tool", "name": "file_search" }, "recipient": "all",
+        "content": { "content_type": "multimodal_text", "parts": [{ "content_type": "image_asset_pointer", "asset_pointer": "sediment://file_fs" }, "WYNIK FILE_SEARCH"] }, "metadata": {} } },
+    "a2": { "id": "a2", "parent": "fs", "children": [],
+      "message": { "author": { "role": "assistant" }, "recipient": "all", "content": { "content_type": "text", "parts": ["Oto wykresy."] }, "metadata": {} } }
+  }
+}

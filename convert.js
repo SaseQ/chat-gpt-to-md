@@ -37,21 +37,50 @@ const HIDDEN_CONTENT_TYPES = ["thoughts", "reasoning_recap", "model_editable_con
 
 // What the user sees as the conversation; everything else (system, hidden context, reasoning, tool traffic) is dropped.
 function isConversationMessage({ author, recipient, content, metadata = {} }) {
-  if (author.role === "system" || author.role === "tool") return false; // ticket 04: tool messages with images
+  if (author.role === "system") return false;
+  if (author.role === "tool" && (author.name === "file_search" || !toolImageCount({ content, metadata }))) return false;
   if (recipient !== "all") return false;
   if (HIDDEN_CONTENT_TYPES.includes(content.content_type)) return false;
   return !metadata.is_visually_hidden_from_conversation && !metadata.is_thinking_preamble_message;
 }
 
-function renderContent({ content, metadata }) {
+const isImagePart = (p) => p?.content_type === "image_asset_pointer";
+// file-service://file-X and sediment://file_X both point at the attachment id after "://".
+const pointerId = (p) => p.asset_pointer?.split("://")[1];
+
+// Generated images (multimodal_text) and code-interpreter charts (execution_output).
+function toolImageCount({ content, metadata = {} }) {
+  if (content.content_type === "multimodal_text") return content.parts.filter(isImagePart).length;
+  if (content.content_type === "execution_output")
+    return (metadata.aggregate_result?.messages || []).filter((m) => m.message_type === "image").length;
+  return 0;
+}
+
+function renderContent({ author, content, metadata = {} }) {
+  if (author.role === "tool") return Array(toolImageCount({ content, metadata })).fill("[obraz]").join("\n");
+  const attachments = (author.role === "user" && metadata.attachments) || [];
   switch (content.content_type) {
+    case "multimodal_text": {
+      const shown = new Set(content.parts.filter(isImagePart).map(pointerId));
+      const name = (part) => attachments.find((a) => a.id === pointerId(part))?.name;
+      const body = content.parts
+        .map((p) => (isImagePart(p) ? (name(p) ? `[obraz: ${name(p)}]` : "[obraz]") : typeof p === "string" ? p : ""))
+        .filter(Boolean).join("\n");
+      return withAttachments(body, attachments.filter((a) => !shown.has(a.id)));
+    }
     case "text":
-      return metadata?.model_dil_v2?.fallbackMarkdown ?? content.parts.join("\n");
+      return withAttachments(metadata.model_dil_v2?.fallbackMarkdown ?? content.parts.join("\n"), attachments);
     case "code":
       return "```" + (content.language || "") + "\n" + content.text + "\n```";
     default:
       return `[Nieobsługiwana treść: ${content.content_type}]`;
   }
+}
+
+// User files as a 📎 list; images already shown inline are excluded by the caller.
+function withAttachments(body, attachments) {
+  const list = attachments.map((a) => `📎 ${a.name}`).join("\n");
+  return [body, list].filter(Boolean).join("\n\n");
 }
 
 // Web-search Citations: content_references and private-use-area markers -> Markdown.
